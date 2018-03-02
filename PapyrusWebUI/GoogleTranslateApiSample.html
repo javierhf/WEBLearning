@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Infinity Docs</title>
+  <meta name="description" content="test">
+  <meta name="author" content="InfinityDocs">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+  <link rel="stylesheet" href="css/styles.css?v=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://allurewebsolutions.com/allure.js"></script>
+    <script src="https://www.googleapis.com/language/translate/v2/"></script>
+
+  <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+  <![endif]-->
+</head>
+    <!-- styles -->
+
+    <style>
+        * {
+          box-sizing: border-box;
+        }
+        .container {
+          width: 100%;
+          max-width: 600px;
+          margin: 20px auto;
+          background: #eee;
+          padding: 20px 10px;
+          border-radius: 10px;
+          text-align: center;
+
+          .col {
+            display: inline-block;
+            width: 46%;
+            margin: 0 1%;
+            vertical-align: top;
+          }
+
+          textarea {
+            display: block;
+            width: 100%;
+            border-radius: 10px;
+            padding: 10px;
+          }
+
+          select {
+            width: 49%;
+            margin-top: 10px;
+          }
+
+          button {
+            display: block;
+            width: 100%;
+            margin: 5px 0;
+            border-radius: 5px;
+            border: none;
+            padding: 5px;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+
+            &.translate {
+              background: green;
+            }
+            &.detect {
+              background: blue;
+            }
+          }
+
+          h2 {
+            display: none;
+            margin: 0;
+          }
+
+          p.target {
+            display: inline-block;
+            margin-top: 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+          }
+        }
+        </style>
+<!-- body -->
+    
+<body> 
+<div id="wrapper">
+  <div class="container">
+    <div class="col">
+      <textarea class="text-to-translate" id="demo1" placeholder="Text to translate">
+        
+        </textarea>
+      
+      <select class="source-lang">
+        <option selected disabled>Source</option>
+      </select>
+      <select class="target-lang">
+        <option selected disabled>Target</option>
+      </select>
+
+      <button class="translate">Translate</button>
+      <button class="detect">Detect Language</button>
+    </div>
+
+    <div class="col">
+      <h2 class="translation-heading">Translation</h2>
+      <h2 class="detection-heading">Detected Language</h2>
+      <p class="target">jhjhkjhkjh</p>
+
+    </div>
+  </div>
+</div>
+    
+
+
+<!-- scripts -->
+  <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="js/scripts.js"></script>
+  <script>
+   	new SimpleMDE({
+		element: document.getElementById("demo1"),
+		spellChecker: false,
+	});
+	
+	new SimpleMDE({
+		element: document.getElementById("demo2"),
+		spellChecker: false,
+		autosave: {
+			enabled: true,
+			unique_id: "demo2",
+		},
+	});
+	
+	new SimpleMDE({
+		element: document.getElementById("demo3"),
+		status: false,
+		toolbar: false,
+	});
+	</script>
+	<script>
+		// Enter an API key from the Google API Console:
+//   https://console.developers.google.com/apis/credentials
+const apiKey = "AIzaSyCJ7_NoaZ4cFjupJuTikKc0-Oq1wH1sAdg";
+
+// Set endpoints
+const endpoints = {
+  translate: "",
+  detect: "detect",
+  languages: "languages"
+};
+SOLICITAR NUEV AAPIKEY A GOOGLE
+https://www.googleapis.com/language/translate/v2/?key=AIzaSyCJ7_NoaZ4cFjupJuTikKc0-Oq1wH1sAdg  
+        
+// Abstract API request function
+function makeApiRequest(endpoint, data, type, authNeeded) {
+  url = "https://www.googleapis.com/language/translate/v2/" + endpoint;
+  url += "?key=" + apiKey;
+
+  // If not listing languages, send text to translate
+  if (endpoint !== endpoints.languages) {
+    url += "&q=" + encodeURI(data.textToTranslate);
+  }
+
+  // If translating, send target and source languages
+  if (endpoint === endpoints.translate) {
+    url += "&target=" + data.targetLang;
+    url += "&source=" + data.sourceLang;
+  }
+
+  // Return response from API
+  return $.ajax({
+    url: url,
+    type: type || "GET",
+    data: data ? JSON.stringify(data) : "",
+    dataType: "json",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json"
+    }
+  });
+}
+
+// Translate
+function translate(data) {
+  makeApiRequest(endpoints.translate, data, "GET", false).success(function(
+    resp
+  ) {
+    $(".target").text(resp.data.translations[0].translatedText);
+    $("h2.detection-heading").hide();
+    $("h2.translation-heading, p").show();
+  });
+}
+
+// Detect language
+function detect(data) {
+  makeApiRequest(endpoints.detect, data, "GET", false).success(function(resp) {
+    source = resp.data.detections[0][0].language;
+    conf = resp.data.detections[0][0].confidence.toFixed(2) * 100;
+
+    $(".source-lang option")
+      .filter(function() {
+        return $(this).val() === source; //To select Blue
+      })
+      .prop("selected", true);
+    $.when(getLanguageNames()).then(function(data) {
+      $("p.target").text(data[source] + " with " + conf + "% confidence");
+    });
+    $("h2.translation-heading").hide();
+    $("h2.detection-heading, p").show();
+  });
+}
+
+// Get languages
+function getLanguages() {
+  makeApiRequest(endpoints.languages, null, "GET", false).success(function(
+    resp
+  ) {
+    $.when(getLanguageNames()).then(function(data) {
+      $.each(resp.data.languages, function(i, obj) {
+        $(".source-lang, .target-lang").append(
+          '<option value="' +
+            obj.language +
+            '">' +
+            data[obj.language] +
+            "</option>"
+        );
+      });
+    });
+  });
+}
+
+// Convert country code to country name
+function getLanguageNames() {
+  return $.getJSON("https://api.myjson.com/bins/155kj1");
+}
+
+// On document ready
+$(function() {
+  window.makeApiRequest = makeApiRequest;
+  var translationObj = {};
+
+  // Popuplate source and target language dropdowns
+  getLanguages();
+
+  $(document)
+    // Bind translate function to translate button
+    .on("click", "button.translate", function() {
+      translationObj = {
+        sourceLang: $(".source-lang").val(),
+        targetLang: $(".target-lang").val(),
+        textToTranslate: $("textarea").val()
+      };
+
+      if (translationObj.targetLang !== null) {
+        translate(translationObj);
+      } else {
+        alert("Please select a target language");
+      }
+    })
+    // Bind detect function to detect button
+    .on("click", "button.detect", function() {
+      translationObj = {
+        textToTranslate: $("textarea").val()
+      };
+
+      detect(translationObj);
+    });
+});
+
+    </script>
+</body>
+</html>
