@@ -78,7 +78,7 @@
           }
 
           p.target {
-            display: inline-block;
+            display:none;
             margin-top: 0;
             padding: 10px;
             border: 1px solid #ccc;
@@ -94,6 +94,7 @@
       <textarea class="text-to-translate" id="demo1" placeholder="Text to translate">
         
         </textarea>
+         <textarea class="text-to-translate" placeholder="Text to translate">Hola, me llamo Juan</textarea>
       
       <select class="source-lang">
         <option selected disabled>Source</option>
@@ -108,8 +109,8 @@
 
     <div class="col">
       <h2 class="translation-heading">Translation</h2>
-      <h2 class="detection-heading">Detected Language</h2>
-      <p class="target">jhjhkjhkjh</p>
+      <h2 class="detection-heading">Hola, me llamo Juan</p>
+      	 <p class="target"></p>
 
     </div>
   </div>
@@ -145,7 +146,7 @@
 	<script>
 		// Enter an API key from the Google API Console:
 //   https://console.developers.google.com/apis/credentials
-const apiKey = "AIzaSyCJ7_NoaZ4cFjupJuTikKc0-Oq1wH1sAdg";
+const apiKey = "AIzaSyAP66869WtHKPNeC9a47oqFfwAPcn70pD4";
 
 // Set endpoints
 const endpoints = {
@@ -153,8 +154,7 @@ const endpoints = {
   detect: "detect",
   languages: "languages"
 };
-SOLICITAR NUEV AAPIKEY A GOOGLE
-https://www.googleapis.com/language/translate/v2/?key=AIzaSyCJ7_NoaZ4cFjupJuTikKc0-Oq1wH1sAdg  
+  
         
 // Abstract API request function
 function makeApiRequest(endpoint, data, type, authNeeded) {
